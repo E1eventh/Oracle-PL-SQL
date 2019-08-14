@@ -1,22 +1,25 @@
-DROP TABLE TAB;
-
-CREATE TABLE TAB
-    (TNUM NUMBER,
-    TNAME VARCHAR2(20));
-    
-INSERT INTO TAB
-    VALUES (1, 'LORD');
-INSERT INTO TAB
-    VALUES (2, 'DIMASIK');
-INSERT INTO TAB
-    VALUES (3, 'SHUROCHKA');
-
+CREATE OR REPLACE TRIGGER up
+BEFORE INSERT 
+    ON SAL
+    FOR EACH ROW
 DECLARE
-   drop_tab VARCHAR(20) := 'DROP TABLE ';
+    t_num NUMBER(4);
+    temp NUMBER(4);
 BEGIN
-    ACCEPT tab_name CHAR PROMPT 'Введите имя таблицы'
-    drop_tab := drop_tab || '&tab_name';
-    EXECUTE IMMEDIATE drop_tab;
+    SELECT MIN(SNUM) INTO t_num FROM SAL;
+    t_num := t_num + 1;
+    
+    LOOP
+        SELECT SNUM INTO temp FROM SAL WHERE SNUM = t_num;
+        t_num := t_num + 1;
+    END LOOP;
+    
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            :new.SNUM := t_num;
 END;
-/
-SELECT * FROM TAB;
+
+SELECT * FROM SAL;
+
+INSERT INTO SAL(SNAME, CITY, COMM)
+  VALUES ('Zeus', 'Olymp', .99);
